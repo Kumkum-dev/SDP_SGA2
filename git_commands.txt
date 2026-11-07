@@ -4,7 +4,9 @@ SDP SGA-2 - Git command log
 Sources: commands recorded in the assignment chat and the saved PowerShell history for SDP_SGA2.
 Repeated commands are listed where they ran. Independent checks in the same batch are grouped.
 <author-name> and <author-email> stand for the supplied commit identity. Device codes are omitted.
-This record ends at preparation of this file for review.
+Sections 1 to 9 cover the workflow through preparation of the original command log for review.
+Section 10 ends at verification of the push of 7230154 to origin/main.
+The commit and push of this extension fall after that checkpoint.
 
 1. Initialize the repository and make the first commit
 ------------------------------------------------------
@@ -319,3 +321,51 @@ git remote -v
 
 git branch -vv
   Displayed the local branch tips and confirmed their upstreams were origin/main and origin/feature.
+
+10. Commit and publish the original command log
+----------------------------------------------
+
+git status --short --branch
+  Confirmed that main tracked origin/main and git_commands.txt was the only pending file.
+
+git remote get-url --push --all origin
+  Verified the push destination was https://github.com/Kumkum-dev/SDP_SGA2.git.
+
+git branch -vv
+  Confirmed main was at 4bc5adc and feature was at 3217ba4, each tracking its remote branch.
+
+gh api --hostname github.com user --jq '.login'
+  Tried to verify the active GitHub login. This first API check could not reach api.github.com.
+
+git status --porcelain --branch
+  Rechecked that git_commands.txt was the only pending file on main before staging it.
+
+git rev-parse --short=7 HEAD
+  Confirmed that the documentation commit would follow the revert commit 4bc5adc.
+
+git add -- git_commands.txt
+  Staged the approved command log as the only file in the new commit.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' commit -m 'Document SDP SGA-2 Git commands'
+  Created commit 7230154 on main using the supplied identity for that command.
+
+gh api --hostname github.com user --jq '.login'
+  Confirmed that GitHub authenticated the session as Kumkum-dev before pushing.
+
+git remote get-url --push --all origin
+  Rechecked the academic repository's push URL before sending the update.
+
+git rev-parse main
+  Resolved the full ID of 7230154 for comparison with the remote main tip after pushing.
+
+git rev-parse feature
+  Resolved the full ID of 3217ba4 for comparison with the remote feature tip after pushing.
+
+git -c 'credential.helper=' -c 'credential.helper=!gh auth git-credential' push origin main
+  Used the verified GitHub CLI login for this push. It advanced remote main from 4bc5adc to 7230154.
+
+git ls-remote --heads origin main feature
+  Confirmed GitHub's main tip was 7230154 and its feature tip was 3217ba4.
+
+git status --short --branch
+  Confirmed the working tree was clean and main was up to date with origin/main.
