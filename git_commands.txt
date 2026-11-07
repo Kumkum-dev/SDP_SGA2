@@ -1,0 +1,321 @@
+SDP SGA-2 - Git command log
+==========================
+
+Sources: commands recorded in the assignment chat and the saved PowerShell history for SDP_SGA2.
+Repeated commands are listed where they ran. Independent checks in the same batch are grouped.
+<author-name> and <author-email> stand for the supplied commit identity. Device codes are omitted.
+This record ends at preparation of this file for review.
+
+1. Initialize the repository and make the first commit
+------------------------------------------------------
+
+git --version
+  Checked the installed Git version.
+
+git rev-parse --show-toplevel
+  Checked whether the folder was already part of a Git repository. Git found none.
+
+git var GIT_AUTHOR_IDENT
+  Checked the author identity Git would use. Git reported that an identity was missing.
+
+git var GIT_COMMITTER_IDENT
+  Checked the committer identity Git would use. Git reported that an identity was missing.
+
+git init --initial-branch=main
+  Initialized the repository with main as the initial branch.
+
+git add -- index.html about.html
+  Staged both HTML files for the first commit.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' commit -m 'Initial project setup'
+  Attempted the first commit. The attempt failed because the sandbox denied access to .git/index.lock.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' commit -m 'Initial project setup'
+  Retried with access to .git and created root commit d897384. The identity applied to this command.
+
+git status
+  Confirmed that main was active and the working tree was clean.
+
+git log --oneline
+  Showed the short ID and subject of the initial commit.
+
+2. Make the second commit on main
+---------------------------------
+
+git status --short --branch
+  Checked that main was active and clean before editing index.html.
+
+git log --oneline -2
+  Requested up to two recent commits. The history contained only d897384 at this point.
+
+git diff -- index.html
+  Showed the new version control section for review.
+
+git diff --check
+  Checked the unstaged edit for whitespace errors.
+
+git branch --show-current
+  Confirmed that main was active before staging.
+
+git rev-parse --short=7 HEAD
+  Checked that the current commit was d897384.
+
+git status --porcelain
+  Confirmed that index.html was the only pending change and was still unstaged.
+
+git add -- index.html
+  Staged the approved index.html edit.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' commit -m 'Add version control introduction'
+  Created commit 32ad1a8 with the staged edit and the supplied identity.
+
+git status
+  Confirmed that main was active and clean after the commit.
+
+git log --oneline
+  Showed 32ad1a8 followed by d897384.
+
+git rev-list --count main
+  Counted the commits reachable from main. Git returned 2.
+
+3. Create and commit on feature
+-------------------------------
+
+git status --short --branch
+  Checked that the working tree was clean on main.
+
+git log --oneline -2
+  Confirmed the two starting commits on main.
+
+git branch --list feature
+  Checked whether a local feature branch already existed. It did not.
+
+git branch feature
+  Created feature at the current commit, 32ad1a8.
+
+git switch feature
+  Made feature the active branch.
+
+git diff -- about.html
+  Showed the new Git branching section for review.
+
+git diff --check
+  Checked the unstaged edit for whitespace errors.
+
+git branch --show-current
+  Confirmed that feature was still active.
+
+git rev-parse --short=7 HEAD
+  Confirmed that feature still pointed to 32ad1a8 before the commit.
+
+git status --porcelain
+  Confirmed that about.html was the only pending change and was still unstaged.
+
+git add -- about.html
+  Staged the approved about.html edit.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' commit -m 'Explain Git branching'
+  Created commit 3217ba4 on feature with the staged edit and the supplied identity.
+
+git branch
+  Listed the local branches and marked feature as active.
+
+git status
+  Confirmed that the working tree was clean on feature.
+
+git log --oneline
+  Showed 3217ba4 above the two earlier commits.
+
+4. Merge feature into main
+--------------------------
+
+git status --short --branch
+  Checked that feature was active and the working tree was clean before the switch.
+
+git log --oneline --graph --all --decorate
+  Showed feature at 3217ba4 and main at 32ad1a8 before the merge.
+
+git merge-base --is-ancestor main feature
+  Confirmed that main's commit was already an ancestor of feature's commit.
+
+git config --get-regexp '^(merge\.ff|branch\.main\.mergeoptions)$'
+  Checked for settings that could affect how the merge runs. Git found no matching settings.
+
+git switch main
+  Switched from feature back to main.
+
+git branch --show-current
+  Confirmed that main was active before the merge.
+
+git merge feature
+  Fast-forwarded main from 32ad1a8 to the existing feature commit 3217ba4.
+
+git grep -n -A 1 -F 'Why Use Git Branches?' main -- about.html
+  Searched the committed about.html on main and showed the heading and following paragraph.
+
+git branch
+  Listed both local branches and marked main as active.
+
+git status
+  Confirmed that the working tree was clean on main.
+
+git log --oneline --graph --all --decorate
+  Showed both branches pointing to 3217ba4 and displayed all three commits.
+
+5. Verify and commit .gitignore
+-------------------------------
+
+git status --short --branch
+  Checked that main was active and clean before creating .gitignore.
+
+git log -1 --oneline
+  Confirmed that 3217ba4 was the latest commit.
+
+git status --ignored
+  Listed the sample log file and temp/ under ignored files.
+
+git check-ignore -v -- sdp-ignore-test.log temp/sdp-ignore-test.txt
+  Confirmed that *.log matched the log file and temp/ matched the file inside the directory.
+
+git status --porcelain --branch
+  Confirmed that .gitignore was the only pending file on main after removing the test samples.
+
+git add -- .gitignore
+  Staged the file containing the two ignore rules.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' commit -m 'Add Git ignore rules'
+  Created commit 2c13477 with .gitignore and the supplied identity.
+
+git status
+  Confirmed that main was active and clean.
+
+git log --oneline
+  Showed 2c13477 at the top of the history.
+
+6. Demonstrate Git undo
+-----------------------
+
+git status
+  Confirmed that main was active and clean before the temporary edit.
+
+git log -1 --oneline --decorate
+  Confirmed that HEAD pointed to main at 2c13477.
+
+git diff -- index.html
+  Showed the single temporary paragraph for review.
+
+git diff --check
+  Checked the unstaged edit for whitespace errors.
+
+git status --porcelain --branch
+  Confirmed that the unstaged index.html edit was the only pending change on main.
+
+git rev-parse --short=7 HEAD
+  Confirmed that 2c13477 was still the current commit.
+
+git add -- index.html
+  Staged the approved temporary paragraph.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' commit -m 'Add temporary paragraph for undo demonstration'
+  Created c1eb090, which added one line to index.html.
+
+git rev-parse HEAD
+  Recorded the full ID of the temporary commit: c1eb090ae42a41a2c450271038abf3876913381e.
+
+git rev-parse HEAD
+  Confirmed that the recorded temporary commit was still current before reverting.
+
+git status --porcelain --branch
+  Confirmed that the working tree was clean on main before reverting.
+
+git -c 'user.name=<author-name>' -c 'user.email=<author-email>' revert --no-edit c1eb090ae42a41a2c450271038abf3876913381e
+  Created 4bc5adc with Git's default revert message. It removed the paragraph and preserved c1eb090.
+
+git diff --exit-code 2c13477 HEAD -- index.html
+  Verified that the committed index.html matched its version before the undo demonstration.
+
+git show --format=oneline --no-ext-diff c1eb090ae42a41a2c450271038abf3876913381e HEAD -- index.html
+  Displayed the original one-line addition and the revert's one-line deletion.
+
+git status
+  Confirmed that the working tree was clean on main after the revert.
+
+git log --oneline --graph --all --decorate
+  Showed the original temporary commit and its revert in the complete history.
+
+7. Check GitHub access and prepare authentication
+-------------------------------------------------
+
+gh --version
+  Checked that GitHub CLI was installed.
+
+gh auth status --hostname github.com
+  Checked the saved GitHub CLI login. It reported an invalid token for the previously configured account.
+
+git status --short --branch
+  Confirmed that the project was clean on main before the GitHub setup.
+
+git log -1 --oneline
+  Confirmed that 4bc5adc was the latest local commit.
+
+git remote
+  Checked for configured remotes. The command listed none at that point.
+
+gh repo create --help
+  Checked the options for creating a public repository and adding a remote from a local folder.
+
+gh auth login --help
+  Checked the options for browser authentication.
+
+gh help environment
+  Checked the environment settings that control GitHub CLI authentication and configuration.
+
+git credential-manager --version
+  Confirmed that Git Credential Manager was installed.
+
+git credential-manager github login --help
+  Checked how to request browser device sign-in for a named account.
+
+git credential-manager github list
+  Tried to list accounts in the project-specific credential namespace. The sandbox denied credential-store access.
+
+git credential-manager github login --username Kumkum-dev --device --no-ui
+  Started device sign-in with the SDP_SGA2 credential namespace. The pending session was stopped after the terminal push.
+
+8. Configure the remote and publish both branches
+-------------------------------------------------
+
+These commands come from saved PowerShell history for the project.
+
+git status
+  Checked the project state before connecting it to GitHub.
+
+git remote -v
+  Checked the project's fetch and push remote URLs before setup.
+
+gh auth login --hostname github.com --web
+  Started browser authentication for GitHub CLI from the user's terminal.
+
+gh auth status
+  Checked the GitHub CLI login before repository creation.
+
+gh repo create Kumkum-dev/SDP_SGA2 --public --source . --remote origin
+  Created the public academic repository and configured origin from the existing local project.
+
+git push -u origin main feature
+  Pushed both branches with their existing history and set their upstream branches on origin.
+
+9. Inspect the repository before preparing this file
+-----------------------------------------------------
+
+git status --short --branch
+  Confirmed that main was tracking origin/main and the working tree was clean before documentation.
+
+git log --oneline --graph --all --decorate
+  Confirmed that origin/main was at 4bc5adc and origin/feature was at 3217ba4 in the local tracking refs.
+
+git remote -v
+  Confirmed that origin's fetch and push URL was https://github.com/Kumkum-dev/SDP_SGA2.git.
+
+git branch -vv
+  Displayed the local branch tips and confirmed their upstreams were origin/main and origin/feature.
